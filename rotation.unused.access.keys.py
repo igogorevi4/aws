@@ -38,6 +38,6 @@ for user in resource.users.all():
                     inactiveDays = today - last
                     if (inactiveDays >= threshold):
                         # Deactivating key
-                        deactivating = client.update_access_key(AccessKeyId=AccessId, Status='Inactive', UserName=user.user_name)
+                        client.update_access_key(AccessKeyId=AccessId, Status='Inactive', UserName=user.user_name)
             else:
                 print('Key is inactive:', AccessId)
