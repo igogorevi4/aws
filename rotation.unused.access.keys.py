@@ -11,7 +11,7 @@ resource = boto3.resource('iam')
 client = boto3.client('iam')
 today = datetime.date.today()
 # Required inactivity threshold. Change to required thresholds
-threshold = datetime.timedelta(days=1)
+threshold = datetime.timedelta(days=30)
 # some trick to get keys that are never used
 notAvaiableKey = 'N/A'
 
@@ -39,5 +39,3 @@ for user in resource.users.all():
                     if (inactiveDays >= threshold):
                         # Deactivating key
                         client.update_access_key(AccessKeyId=AccessId, Status='Inactive', UserName=user.user_name)
-            else:
-                print('Key is inactive:', AccessId)
