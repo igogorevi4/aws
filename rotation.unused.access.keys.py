@@ -1,19 +1,32 @@
 #!/usr/bin/env python3
 
-# This script revokes users' key if there is no any activity during last 30 days. Or if key had been created more that 30 days ago and never used.
-# as AWS recommends https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#rotating_access_keys_cli
-# Run in AWS Lambda by schedule (CloudWatch Event) https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/RunLambdaSchedule.html 
-
 import boto3
 import datetime
+import sys
 
 resource = boto3.resource('iam')
 client = boto3.client('iam')
 today = datetime.date.today()
-# Required inactivity threshold. Change to required thresholds
-threshold = datetime.timedelta(days=30)
+# Reading required inactivity threshold
+thresholdDays = int(sys.stdin.read())
+threshold = datetime.timedelta(days=thresholdDays)
 # some trick to get keys that are never used
 notAvaiableKey = 'N/A'
+
+
+def deactivateAcessKey(AccessId, user):
+    client.update_access_key(AccessKeyId=AccessId, Status='Inactive',
+                             UserName=user.user_name)
+
+
+def deleteObsoleteKey(AccessId, user):
+    client.delete_access_key(AccessKeyId=AccessId,
+                             UserName=user.user_name)
+
+
+def createNewAccessKey(user):
+    client.create_access_key(UserName=user.user_name)
+
 
 for user in resource.users.all():
     Metadata = client.list_access_keys(UserName=user.user_name)
@@ -30,7 +43,9 @@ for user in resource.users.all():
                     unsedDays = today - creationDate
                     if (unsedDays >= threshold):
                         # Deactivating key
-                        client.update_access_key(AccessKeyId=AccessId, Status='Inactive', UserName=user.user_name)
+                        deactivateAcessKey(AccessId, user)
+                        deleteObsoleteKey(AccessId, user)
+                        createNewAccessKey(user)
                 # else check its last used date
                 else:
                     lastUsedTimestamp = LastUsed['AccessKeyLastUsed'].get('LastUsedDate')
@@ -38,4 +53,4 @@ for user in resource.users.all():
                     inactiveDays = today - last
                     if (inactiveDays >= threshold):
                         # Deactivating key
-                        client.update_access_key(AccessKeyId=AccessId, Status='Inactive', UserName=user.user_name)
+                        deactivateAcessKey(AccessId, user)
