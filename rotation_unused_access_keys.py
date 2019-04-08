@@ -92,7 +92,6 @@ def deactivate_never_used_key(meta, access_id, user):
     unused_days = today - creation_date
     if unused_days > threshold:
         deactivate_access_key(access_id, user)
-        # print(user.name)        # debug
         send_message(user)
 
 
@@ -102,7 +101,6 @@ def deactivate_too_old_key(last_used, access_id, user):
     uinactive_days = today - last
     if uinactive_days > threshold:
         deactivate_access_key(access_id, user)
-        # print(user.name)        # debug
         send_message(user)
 
 
