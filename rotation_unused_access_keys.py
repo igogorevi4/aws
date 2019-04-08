@@ -82,7 +82,6 @@ def clean_key(user, key, meta):
     # check if key is never used
     if not_available_key in last_used['AccessKeyLastUsed']['ServiceName']:
         deactivate_never_used_key(meta, access_id, user)
-    # else check its last used date
     else:
         deactivate_too_old_key(last_used, access_id, user)
 
@@ -92,7 +91,6 @@ def deactivate_never_used_key(meta, access_id, user):
     creation_date = access_key_metadata['CreateDate'].date()
     unused_days = today - creation_date
     if unused_days > threshold:
-        # Deactivating key
         deactivate_access_key(access_id, user)
         # print(user.name)        # debug
         send_message(user)
@@ -103,7 +101,6 @@ def deactivate_too_old_key(last_used, access_id, user):
     last = last_used_timestamp.date()
     uinactive_days = today - last
     if uinactive_days > threshold:
-        # Deactivating key
         deactivate_access_key(access_id, user)
         # print(user.name)        # debug
         send_message(user)
