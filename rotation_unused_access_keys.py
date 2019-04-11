@@ -90,8 +90,8 @@ def deactivate_key_for_user(user):
     for key in user.access_keys.all():
         access_id = key.access_key_id
         key_status = key.status
-        creation_date = key.create_date.date()
         if key_status == "Active":
+            creation_date = key.create_date.date()
             expiration_key(access_id, user, creation_date)
             
 
