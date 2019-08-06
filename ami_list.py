@@ -5,7 +5,7 @@ import argparse
 import os
 import json
 
-# IDBS owner ID
+# owner ID
 owner = '1234567890' 
 
 
