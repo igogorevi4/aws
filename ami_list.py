@@ -50,16 +50,10 @@ def lambda_handler(event, context):
     arg = ''
     argparser = argparse.ArgumentParser()
     argparser.add_argument('-n', help='AMI name')
-    argparser.add_argument('-t', help='AMI tag')
+    argparser.add_argument('-t', help='AMI tag', action='append')
     argparser.add_argument('-l', help='return latest AMI', action='store_true')
-    
-    #Iterate through received event, make args from it and parse it :) 
-    for key, value in event.items():
-        arg = [key]
-        args.append(key)
-        arg = value
-        args.append(value)
-    parameters, unknown = argparser.parse_known_args(args)
+
+    parameters = argparser.parse_args()
 
     if parameters.n:
         image_name = parameters.n
@@ -68,7 +62,7 @@ def lambda_handler(event, context):
     if parameters.l:
         # If THERE IS a flag just pass it to boolean
         latest = True
-    
+
     if image_tag is not '':
         # Default filters
         filters = [ {
@@ -76,7 +70,7 @@ def lambda_handler(event, context):
             'Values': [image_name]
         },{
             'Name': 'tag-key',
-            'Values': [image_tag]
+            'Values': image_tag
         } ]
     else:
         filters = [ {
